@@ -108,7 +108,7 @@ public class MyXMPP {
 
         XMPPTCPConnectionConfiguration.Builder config = XMPPTCPConnectionConfiguration
                 .builder();
-        config.setSecurityMode(ConnectionConfiguration.SecurityMode.disabled);
+        config.setSecurityMode(ConnectionConfiguration.SecurityMode.required);
         config.setServiceName(serverAddress);
         config.setHost(serverAddress);
         config.setPort(5222);

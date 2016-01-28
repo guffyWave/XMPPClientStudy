@@ -15,9 +15,16 @@ public class MyService extends Service {
     //    private static final String DOMAIN = "xmpp.jp";
 //    private static final String USERNAME = "guffyrocks";
 //    private static final String PASSWORD = "babu1267";
+
     private static final String DOMAIN = "guffyloggerstudy.appspotchat.com";
     private static final String USERNAME = "anyuser";
     private static final String PASSWORD = "babu1267";
+
+
+//    private static final String DOMAIN = "gmail.com";
+//    private static final String USERNAME = "guffy1267";
+//    private static final String PASSWORD = "cvds";
+
 
     public static ConnectivityManager cm;
     public static MyXMPP xmpp;
