@@ -12,9 +12,13 @@ import org.jivesoftware.smack.chat.Chat;
  * Created by gufran on 1/28/16.
  */
 public class MyService extends Service {
-    private static final String DOMAIN = "xmpp.jp";
-    private static final String USERNAME = "khushi";
-    private static final String PASSWORD = "password";
+    //    private static final String DOMAIN = "xmpp.jp";
+//    private static final String USERNAME = "guffyrocks";
+//    private static final String PASSWORD = "babu1267";
+    private static final String DOMAIN = "guffyloggerstudy.appspotchat.com";
+    private static final String USERNAME = "anyuser";
+    private static final String PASSWORD = "babu1267";
+
     public static ConnectivityManager cm;
     public static MyXMPP xmpp;
     public static boolean ServerchatCreated = false;

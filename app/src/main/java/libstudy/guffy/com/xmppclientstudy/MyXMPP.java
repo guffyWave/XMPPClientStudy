@@ -25,6 +25,16 @@ import org.jivesoftware.smackx.receipts.DeliveryReceiptManager;
 import org.jivesoftware.smackx.receipts.ReceiptReceivedListener;
 
 import java.io.IOException;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 import libstudy.guffy.com.xmppclientstudy.dto.ChatMessage;
 
@@ -47,6 +57,24 @@ public class MyXMPP {
     public static MyXMPP instance = null;
     public static boolean instanceCreated = false;
 
+
+    public org.jivesoftware.smack.chat.Chat Mychat;
+
+    ChatManagerListenerImpl mChatManagerListener;
+    MMessageListener mMessageListener;
+
+    String text = "";
+    String mMessage = "", mReceiver = "";
+
+    static {
+        try {
+            //disableSslVerification();
+            Class.forName("org.jivesoftware.smack.ReconnectionManager");
+        } catch (ClassNotFoundException ex) {
+            // problem loading reconnection manager
+        }
+    }
+
     public MyXMPP(MyService context, String serverAdress, String logiUser,
                   String passwordser) {
         this.serverAddress = serverAdress;
@@ -59,7 +87,6 @@ public class MyXMPP {
 
     public static MyXMPP getInstance(MyService context, String server,
                                      String user, String pass) {
-
         if (instance == null) {
             instance = new MyXMPP(context, server, user, pass);
             instanceCreated = true;
@@ -68,21 +95,6 @@ public class MyXMPP {
 
     }
 
-    public org.jivesoftware.smack.chat.Chat Mychat;
-
-    ChatManagerListenerImpl mChatManagerListener;
-    MMessageListener mMessageListener;
-
-    String text = "";
-    String mMessage = "", mReceiver = "";
-
-    static {
-        try {
-            Class.forName("org.jivesoftware.smack.ReconnectionManager");
-        } catch (ClassNotFoundException ex) {
-            // problem loading reconnection manager
-        }
-    }
 
     public void init() {
         gson = new Gson();
@@ -149,7 +161,6 @@ public class MyXMPP {
                         public void onReceiptReceived(final String fromid,
                                                       final String toid, final String msgid,
                                                       final Stanza packet) {
-
                         }
                     });
                     connected = true;
@@ -261,7 +272,8 @@ public class MyXMPP {
             Log.e("xmpp.SendMessage()", "msg Not sent!-Not Connected!");
 
         } catch (Exception e) {
-            Log.e("xmpp.SendMessage()-Exception",
+            String tag = "xmpp.SendMsg()Exception";
+            Log.e(tag,
                     "msg Not sent!" + e.getMessage());
         }
 
@@ -442,5 +454,49 @@ public class MyXMPP {
             });
         }
 
+    }
+
+
+    private static void disableSslVerification() {
+        try {
+            // Create a trust manager that does not validate certificate chains
+            TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager() {
+
+                @Override
+                public void checkClientTrusted(java.security.cert.X509Certificate[] x509Certificates, String s) throws CertificateException {
+
+                }
+
+                @Override
+                public void checkServerTrusted(java.security.cert.X509Certificate[] x509Certificates, String s) throws CertificateException {
+
+                }
+
+                @Override
+                public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                    return new java.security.cert.X509Certificate[0];
+                }
+            }
+            };
+
+            // Install the all-trusting trust manager
+            SSLContext sc = SSLContext.getInstance("SSL");
+            sc.init(null, trustAllCerts, new java.security.SecureRandom());
+            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+
+            // Create all-trusting host name verifier
+            HostnameVerifier allHostsValid = new HostnameVerifier() {
+                public boolean verify(String hostname, SSLSession session) {
+                    return true;
+                }
+            };
+
+            // Install the all-trusting host verifier
+            HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid);
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (KeyManagementException e) {
+            e.printStackTrace();
+        }
     }
 }
