@@ -1,1 +1,2 @@
-include ':app', ':memorizingtrustmanager'
+include ':app'
+include ':library:memorizingtrustmanager'
