@@ -36,7 +36,6 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
-import de.duenndns.ssl.MemorizingTrustManager;
 import libstudy.guffy.com.xmppclientstudy.dto.ChatMessage;
 
 /**
@@ -107,7 +106,6 @@ public class MyXMPP {
 
     private void initialiseConnection() {
 
-
         try {
             XMPPTCPConnectionConfiguration.Builder config = XMPPTCPConnectionConfiguration
                     .builder();
@@ -115,11 +113,11 @@ public class MyXMPP {
             config.setServiceName(serverAddress);
             config.setHost(serverAddress);
 
-            SSLContext sc = SSLContext.getInstance("TLS");
-            MemorizingTrustManager mtm = new MemorizingTrustManager(context);
-            sc.init(null, new X509TrustManager[]{mtm}, new java.security.SecureRandom());
-            config.setCustomSSLContext(sc);
-            config.setHostnameVerifier(mtm.wrapHostnameVerifier(new org.apache.http.conn.ssl.StrictHostnameVerifier()));
+//            SSLContext sc = SSLContext.getInstance("TLS");
+//            MemorizingTrustManager mtm = new MemorizingTrustManager(context);
+//            sc.init(null, new X509TrustManager[]{mtm}, new java.security.SecureRandom());
+//            config.setCustomSSLContext(sc);
+//            config.setHostnameVerifier(mtm.wrapHostnameVerifier(new org.apache.http.conn.ssl.StrictHostnameVerifier()));
 
             config.setPort(5222);
             config.setDebuggerEnabled(true);
@@ -128,8 +126,8 @@ public class MyXMPP {
             connection = new XMPPTCPConnection(config.build());
             XMPPConnectionListener connectionListener = new XMPPConnectionListener();
             connection.addConnectionListener(connectionListener);
-        } catch (NoSuchAlgorithmException asle) {
-            System.out.println("NoSuchAlgorithmException " + asle.getMessage());
+//        } catch (NoSuchAlgorithmException asle) {
+//            System.out.println("NoSuchAlgorithmException " + asle.getMessage());
         } catch (Exception e) {
             System.out.println("Exception " + e.getMessage());
         }

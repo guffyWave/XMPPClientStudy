@@ -30,29 +30,34 @@ import android.app.Activity;
 import android.app.Application;
 import android.app.Notification;
 import android.app.NotificationManager;
-import android.app.Service;
 import android.app.PendingIntent;
+import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.util.SparseArray;
 import android.os.Handler;
+import android.util.SparseArray;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.cert.*;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.security.cert.CertPathValidatorException;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateExpiredException;
+import java.security.cert.CertificateParsingException;
+import java.security.cert.X509Certificate;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.Locale;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSession;
@@ -80,8 +85,8 @@ public class MemorizingTrustManager implements X509TrustManager {
     final static String DECISION_TITLE_ID = DECISION_INTENT + ".titleId";
     private final static int NOTIFICATION_ID = 100509;
 
-    // static String KEYSTORE_DIR = "Keystore";
-    //  static String KEYSTORE_FILE = "guffy.bks";
+    static String KEYSTORE_DIR = "Keystore";
+    static String KEYSTORE_FILE = "kcl";
 
     Context master;
     Activity foregroundAct;
@@ -150,10 +155,10 @@ public class MemorizingTrustManager implements X509TrustManager {
             throw new ClassCastException("MemorizingTrustManager context must be either Activity or Service!");
 
 
-//        File dir = app.getDir(KEYSTORE_DIR, Context.MODE_PRIVATE);
-//        keyStoreFile = new File(dir + File.separator + KEYSTORE_FILE);
+        File dir = app.getDir(KEYSTORE_DIR, Context.MODE_PRIVATE);
+        keyStoreFile = new File(dir + File.separator + KEYSTORE_FILE);
 
-        appKeyStore = loadAppKeyStore(app);
+        //  appKeyStore = loadAppKeyStore(app);
     }
 
 
@@ -327,9 +332,9 @@ public class MemorizingTrustManager implements X509TrustManager {
         }
         InputStream is = null;
         try {
-            is = app.getAssets().open("guffy.bks");
+            //is = app.getAssets().open(KEYSTORE_FILE);
 
-            // is = new java.io.FileInputStream(keyStoreFile);
+            is = new java.io.FileInputStream(keyStoreFile);
             ks.load(is, "MTM".toCharArray());
         } catch (NoSuchAlgorithmException | CertificateException | IOException e) {
             LOGGER.log(Level.INFO, "getAppKeyStore(" + keyStoreFile + ") - exception loading file key store", e);
@@ -676,27 +681,28 @@ public class MemorizingTrustManager implements X509TrustManager {
 
         @Override
         public boolean verify(String hostname, SSLSession session) {
-            LOGGER.log(Level.FINE, "hostname verifier for " + hostname + ", trying default verifier first");
-            // if the default verifier accepts the hostname, we are done
-            if (defaultVerifier.verify(hostname, session)) {
-                LOGGER.log(Level.FINE, "default verifier accepted " + hostname);
-                return true;
-            }
-            // otherwise, we check if the hostname is an alias for this cert in our keystore
-            try {
-                X509Certificate cert = (X509Certificate) session.getPeerCertificates()[0];
-                //Log.d(TAG, "cert: " + cert);
-                if (cert.equals(appKeyStore.getCertificate(hostname.toLowerCase(Locale.US)))) {
-                    LOGGER.log(Level.FINE, "certificate for " + hostname + " is in our keystore. accepting.");
-                    return true;
-                } else {
-                    LOGGER.log(Level.FINE, "server " + hostname + " provided wrong certificate, asking user.");
-                    return interactHostname(cert, hostname);
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-                return false;
-            }
+//            LOGGER.log(Level.FINE, "hostname verifier for " + hostname + ", trying default verifier first");
+//            // if the default verifier accepts the hostname, we are done
+//            if (defaultVerifier.verify(hostname, session)) {
+//                LOGGER.log(Level.FINE, "default verifier accepted " + hostname);
+//                return true;
+//            }
+//            // otherwise, we check if the hostname is an alias for this cert in our keystore
+//            try {
+//                X509Certificate cert = (X509Certificate) session.getPeerCertificates()[0];
+//                //Log.d(TAG, "cert: " + cert);
+//                if (cert.equals(appKeyStore.getCertificate(hostname.toLowerCase(Locale.getDefault())))) {
+//                    LOGGER.log(Level.FINE, "certificate for " + hostname + " is in our keystore. accepting.");
+//                    return true;
+//                } else {
+//                    LOGGER.log(Level.FINE, "server " + hostname + " provided wrong certificate, asking user.");
+//                    return interactHostname(cert, hostname);
+//                }
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//                return false;
+//            }
+            return true;
         }
     }
 }
